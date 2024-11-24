@@ -1,8 +1,10 @@
 import requests
 import json
 from pprint import pprint
+from kafka import KafkaProducer
 from constants import YOUTUBE_API_KEY
 if __name__ == "__main__":
+    producer = KafkaProducer(bootstrap_servers=['localhost:9092'])
     response = requests.get("https://www.googleapis.com/youtube/v3/videos",
     
                             {
@@ -24,3 +26,6 @@ if __name__ == "__main__":
             'thumbnail': video['snippet']['thumbnails']['default']['url']
         }
     print(pprint(video_res))
+
+    producer.send('youtube_videos', json.dumps(video_res).encode('utf-8'))
+    producer.flush()
